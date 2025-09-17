@@ -14,14 +14,13 @@ import com.agileboot.domain.system.role.query.AllocatedRoleQuery;
 import com.agileboot.domain.system.role.query.RoleQuery;
 import com.agileboot.domain.system.role.query.UnallocatedRoleQuery;
 import com.agileboot.domain.system.user.dto.UserDTO;
-import com.agileboot.infrastructure.annotations.AccessLog;
-import com.agileboot.orm.common.enums.BusinessTypeEnum;
+import com.agileboot.admin.customize.aop.accessLog.AccessLog;
+import com.agileboot.common.enums.common.BusinessTypeEnum;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -46,8 +45,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SysRoleController extends BaseController {
 
-    @NonNull
-    private RoleApplicationService roleApplicationService;
+    private final RoleApplicationService roleApplicationService;
 
     @Operation(summary = "角色列表")
     @PreAuthorize("@permission.has('system:role:list')")
@@ -94,7 +92,7 @@ public class SysRoleController extends BaseController {
      */
     @Operation(summary = "删除角色")
     @PreAuthorize("@permission.has('system:role:remove')")
-    @AccessLog(title = "角色管理", businessType = BusinessTypeEnum.ADD)
+    @AccessLog(title = "角色管理", businessType = BusinessTypeEnum.DELETE)
     @DeleteMapping(value = "/{roleId}")
     public ResponseDTO<Void> remove(@PathVariable("roleId") List<Long> roleIds) {
         roleApplicationService.deleteRoleByBulk(roleIds);

@@ -35,6 +35,7 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -79,6 +80,10 @@ public class JacksonUtil {
         } catch (Exception e) {
             log.error("jackson config error", e);
         }
+    }
+
+    private JacksonUtil() {
+        throw new IllegalStateException("Utility class JacksonUtil can not be instantiated");
     }
 
     public static ObjectMapper initMapper() {
@@ -266,7 +271,7 @@ public class JacksonUtil {
      */
     public static <V> List<V> fromList(String json, Class<V> type) {
         if (StringUtils.isEmpty(json)) {
-            return null;
+            return Collections.emptyList();
         }
         try {
             CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(ArrayList.class, type);
@@ -281,7 +286,7 @@ public class JacksonUtil {
      */
     public static Map<String, Object> fromMap(String json) {
         if (StringUtils.isEmpty(json)) {
-            return null;
+            return Collections.emptyMap();
         }
         try {
             MapType mapType = mapper.getTypeFactory().constructMapType(HashMap.class, String.class, Object.class);
@@ -497,12 +502,12 @@ public class JacksonUtil {
      */
     public static byte[] getAsBytes(String json, String key) {
         if (StringUtils.isEmpty(json)) {
-            return null;
+            return new byte[0];
         }
         try {
             JsonNode jsonNode = getAsJsonObject(json, key);
             if (null == jsonNode) {
-                return null;
+                return new byte[0];
             }
             return jsonNode.isBinary() ? jsonNode.binaryValue() : getAsString(jsonNode).getBytes();
         } catch (Exception e) {
@@ -540,12 +545,12 @@ public class JacksonUtil {
      */
     public static <V> List<V> getAsList(String json, String key, Class<V> type) {
         if (StringUtils.isEmpty(json)) {
-            return null;
+            return Collections.emptyList();
         }
         try {
             JsonNode jsonNode = getAsJsonObject(json, key);
             if (null == jsonNode) {
-                return null;
+                return Collections.emptyList();
             }
             CollectionType collectionType = mapper.getTypeFactory().constructCollectionType(ArrayList.class, type);
             return from(getAsString(jsonNode), collectionType);

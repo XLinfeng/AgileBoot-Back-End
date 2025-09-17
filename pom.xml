@@ -6,14 +6,15 @@
 
     <groupId>com.agileboot</groupId>
     <artifactId>agileboot</artifactId>
-    <version>${revision}</version>
+    <!--  放弃使用 revision字段 子module会安装失败-->
+    <!--  https://stackoverflow.com/questions/52173260/how-to-resolve-parent-pom-dependency-issue-failed-to-read-artifact-descriptor -->
+    <version>1.0.0</version>
 
     <name>agileboot</name>
     <url>http://www.agileboot.vip</url>
     <description>基于 springboot的快速开发系统</description>
 
     <properties>
-        <revision>1.0.0</revision>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
@@ -32,10 +33,9 @@
         <velocity.version>2.3</velocity.version>
         <jwt.version>0.9.1</jwt.version>
         <hutool.version>5.7.22</hutool.version>
-        <lombok.version>1.18.24</lombok.version>
+        <lombok.version>1.18.30</lombok.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <mybatis-plus-generator.version>3.5.1</mybatis-plus-generator.version>
-        <mockito.version>1.10.19</mockito.version>
         <it.ozimov.version>0.7.3</it.ozimov.version>
         <io.swagger.version>1.6.8</io.swagger.version>
         <org.lionsoul.version>2.6.5</org.lionsoul.version>
@@ -44,8 +44,13 @@
         <mysql-connector-java>8.0.31</mysql-connector-java>
         <spring.boot.version>2.7.10</spring.boot.version>
         <maven.compiler.plugin.version>3.1</maven.compiler.plugin.version>
-        <maven.surefire.plugin.version>2.5</maven.surefire.plugin.version>
+        <!-- 升级版本以支持junit5 -->
+        <maven.surefire.plugin.version>3.0.0-M7</maven.surefire.plugin.version>
         <maven.war.plugin.version>3.1.0</maven.war.plugin.version>
+        <!-- JUnit Jupiter 版本 -->
+        <junit.jupiter.version>5.9.2</junit.jupiter.version>
+        <!-- Mockito 版本（或直接用 mockito-inline）-->
+        <mockito.version>4.11.0</mockito.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -171,42 +176,35 @@
             <dependency>
                 <groupId>com.agileboot</groupId>
                 <artifactId>agileboot-admin</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
 
-            <!-- 定时任务-->
+            <!-- app预留接口-->
             <dependency>
                 <groupId>com.agileboot</groupId>
                 <artifactId>agileboot-api</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
 
-            <!-- 代码生成-->
+            <!-- 核心业务领域-->
             <dependency>
                 <groupId>com.agileboot</groupId>
                 <artifactId>agileboot-domain</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!-- 核心模块-->
             <dependency>
                 <groupId>com.agileboot</groupId>
                 <artifactId>agileboot-infrastructure</artifactId>
-                <version>${revision}</version>
-            </dependency>
-
-            <!-- 系统模块-->
-            <dependency>
-                <groupId>com.agileboot</groupId>
-                <artifactId>agileboot-orm</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!-- 通用工具-->
             <dependency>
                 <groupId>com.agileboot</groupId>
                 <artifactId>agileboot-common</artifactId>
-                <version>${revision}</version>
+                <version>${project.version}</version>
             </dependency>
 
             <!-- hutool common tools-->
@@ -223,11 +221,34 @@
                 <scope>provided</scope>
             </dependency>
 
+            <!-- JUnit 5 -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>${junit.jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
+                <version>${junit.jupiter.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!-- Mockito -->
             <dependency>
                 <groupId>org.mockito</groupId>
-                <artifactId>mockito-all</artifactId>
+                <artifactId>mockito-core</artifactId>
                 <version>${mockito.version}</version>
                 <scope>test</scope>
+            </dependency>
+
+            <!-- 如果有需要 mock final/静态 -->
+            <dependency>
+              <groupId>org.mockito</groupId>
+              <artifactId>mockito-inline</artifactId>
+              <version>${mockito.version}</version>
+              <scope>test</scope>
             </dependency>
 
             <!-- 获取系统信息 -->
@@ -280,8 +301,6 @@
         <module>agileboot-common</module>
         <module>agileboot-domain</module>
         <module>agileboot-infrastructure</module>
-        <module>agileboot-orm</module>
-        <module>agileboot-integration-test</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -314,6 +333,7 @@
     <build>
 
         <pluginManagement>
+
             <plugins>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>

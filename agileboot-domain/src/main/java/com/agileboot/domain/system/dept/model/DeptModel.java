@@ -6,10 +6,10 @@ import com.agileboot.common.exception.ApiException;
 import com.agileboot.common.exception.error.ErrorCode;
 import com.agileboot.domain.system.dept.command.AddDeptCommand;
 import com.agileboot.domain.system.dept.command.UpdateDeptCommand;
-import com.agileboot.orm.common.enums.StatusEnum;
-import com.agileboot.orm.common.util.BasicEnumUtil;
-import com.agileboot.orm.system.entity.SysDeptEntity;
-import com.agileboot.orm.system.service.ISysDeptService;
+import com.agileboot.common.enums.common.StatusEnum;
+import com.agileboot.common.enums.BasicEnumUtil;
+import com.agileboot.domain.system.dept.db.SysDeptEntity;
+import com.agileboot.domain.system.dept.db.SysDeptService;
 import java.util.Objects;
 
 /**
@@ -17,13 +17,13 @@ import java.util.Objects;
  */
 public class DeptModel extends SysDeptEntity {
 
-    private ISysDeptService deptService;
+    private final SysDeptService deptService;
 
-    public DeptModel(ISysDeptService deptService) {
+    public DeptModel(SysDeptService deptService) {
         this.deptService = deptService;
     }
 
-    public DeptModel(SysDeptEntity entity, ISysDeptService deptService) {
+    public DeptModel(SysDeptEntity entity, SysDeptService deptService) {
         if (entity != null) {
             // 如果大数据量的话  可以用MapStruct优化
             BeanUtil.copyProperties(entity, this);
@@ -33,12 +33,12 @@ public class DeptModel extends SysDeptEntity {
 
     public void loadAddCommand(AddDeptCommand addCommand) {
         this.setParentId(addCommand.getParentId());
-        this.setAncestors(addCommand.getAncestors());
         this.setDeptName(addCommand.getDeptName());
         this.setOrderNum(addCommand.getOrderNum());
         this.setLeaderName(addCommand.getLeaderName());
         this.setPhone(addCommand.getPhone());
         this.setEmail(addCommand.getEmail());
+        this.setStatus(addCommand.getStatus());
     }
 
     public void loadUpdateCommand(UpdateDeptCommand updateCommand) {
@@ -71,19 +71,24 @@ public class DeptModel extends SysDeptEntity {
     }
 
     public void generateAncestors() {
-        if (getParentId() == 0) {
-            setAncestors(getParentId().toString());
+
+        // 处理 getParentId 可能为 null 的情况
+        if (getParentId() == null || getParentId() == 0) {
+            setAncestors(String.valueOf(getParentId() == null ? 0 : getParentId()));
             return;
         }
 
         SysDeptEntity parentDept = deptService.getById(getParentId());
 
+        // 检查 parentDept 是否为 null 或者状态为禁用
         if (parentDept == null || StatusEnum.DISABLE.equals(
             BasicEnumUtil.fromValue(StatusEnum.class, parentDept.getStatus()))) {
             throw new ApiException(ErrorCode.Business.DEPT_PARENT_DEPT_NO_EXIST_OR_DISABLED);
         }
 
-        setAncestors(parentDept.getAncestors() + "," + getParentId());
+        // 处理 parentDept.getAncestors() 可能为 null 的情况
+        String ancestors = parentDept.getAncestors() == null ? "" : parentDept.getAncestors();
+        setAncestors(ancestors + "," + getParentId());
     }
 
 

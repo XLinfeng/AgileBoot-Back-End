@@ -8,12 +8,11 @@ import com.agileboot.domain.system.notice.dto.NoticeDTO;
 import com.agileboot.domain.system.notice.model.NoticeModel;
 import com.agileboot.domain.system.notice.model.NoticeModelFactory;
 import com.agileboot.domain.system.notice.query.NoticeQuery;
-import com.agileboot.orm.system.entity.SysNoticeEntity;
-import com.agileboot.orm.system.service.ISysNoticeService;
+import com.agileboot.domain.system.notice.db.SysNoticeEntity;
+import com.agileboot.domain.system.notice.db.SysNoticeService;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,11 +23,9 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class NoticeApplicationService {
 
-    @NonNull
-    private ISysNoticeService noticeService;
+    private final SysNoticeService noticeService;
 
-    @NonNull
-    private NoticeModelFactory noticeModelFactory;
+    private final NoticeModelFactory noticeModelFactory;
 
     public PageDTO<NoticeDTO> getNoticeList(NoticeQuery query) {
         Page<SysNoticeEntity> page = noticeService.getNoticeList(query.toPage(), query.toQueryWrapper());
